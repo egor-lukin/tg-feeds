@@ -279,7 +279,11 @@ func (fetcher *TelegramWebFetcher) FetchPost(channelName string, id int) (Post, 
 
 	var content string
 	doc.Find(".tgme_widget_message_text.js-message_text").Each(func(i int, s *goquery.Selection) {
-		content = s.Text()
+		s.Find("br").Each(func(i int, br *goquery.Selection) {
+			br.ReplaceWithHtml("\n")
+		})
+
+		content = strings.TrimSpace(s.Text())
 	})
 
 	var createdAt time.Time
@@ -295,7 +299,8 @@ func (fetcher *TelegramWebFetcher) FetchPost(channelName string, id int) (Post, 
 
 	var headerContent string
 	if len(content) > 100 {
-		headerContent = strings.Trim(content[0:100], " ") + "..."
+		trimmed := strings.ReplaceAll(content[0:100], "\n", " ")
+		headerContent = strings.Trim(trimmed, " ") + "..."
 	}
 
 	content = content + "\n\n" + "<a href=\"" + url + "\">[link]</a>"

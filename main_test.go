@@ -68,7 +68,18 @@ func TestFetchPost(t *testing.T) {
 		t.Errorf("Invalid header, actual - %s", err.Error())
 	}
 
-	expectedHeader := "All humans are capable of both good and evil. And most who do evil believe they are doing good. Hist..."
+	expectedContent := `All humans are capable of both good and evil. And most who do evil believe they are doing good.
+
+
+History shows this over and over again.
+
+<a href="https://t.me/lexfridman/272?embed=1&mode=tme">[link]</a>`
+
+	if post.Content != expectedContent {
+		t.Errorf("Invalid post content, expected - %s, actual - %s", expectedContent, post.Content)
+	}
+
+	expectedHeader := "All humans are capable of both good and evil. And most who do evil believe they are doing good.   Hi..."
 	if post.Header != expectedHeader {
 		t.Errorf("Invalid post header, expected - %s, actual - %s", expectedHeader, post.Header)
 	}
