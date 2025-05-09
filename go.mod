@@ -1,4 +1,4 @@
-module tg-rss
+module github.com/egor-lukin/tg-feeds
 
 go 1.20
 
