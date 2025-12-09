@@ -278,12 +278,17 @@ func (fetcher *TelegramWebFetcher) FetchPost(channelName string, id int) (Post, 
 	}
 
 	var content string
+	var rawContent string
 	doc.Find(".tgme_widget_message_text.js-message_text").Each(func(i int, s *goquery.Selection) {
+		html, _ := s.Html()
+		content = strings.TrimSpace(html)
+		content = strings.ReplaceAll(content, "<br/>", "<br>")
+
 		s.Find("br").Each(func(i int, br *goquery.Selection) {
 			br.ReplaceWithHtml("\n")
 		})
 
-		content = strings.TrimSpace(s.Text())
+		rawContent = strings.TrimSpace(s.Text())
 	})
 
 	var createdAt time.Time
@@ -299,11 +304,11 @@ func (fetcher *TelegramWebFetcher) FetchPost(channelName string, id int) (Post, 
 
 	var headerContent string
 	if len(content) > 100 {
-		trimmed := strings.ReplaceAll(content[0:100], "\n", " ")
+		trimmed := strings.ReplaceAll(rawContent[0:100], "\n", " ")
 		headerContent = strings.Trim(trimmed, " ") + "..."
 	}
 
-	content = content + "\n\n" + "<a href=\"" + url + "\">[link]</a>"
+	content = content + "<br>" + "<a href=\"" + url + "\">[link]</a>"
 
 	return Post{Header: headerContent, Content: content, Link: url, CreatedAt: createdAt}, nil
 }
@@ -391,7 +396,7 @@ func prepareFeed(channelName string, cache Cache, fetcher Fetcher) (*feeds.Feed,
 				}
 
 				if len(posts) > 0 && post.CreatedAt == posts[len(posts)-1].CreatedAt {
-					fmt.Printf("Duplicated post")
+					fmt.Printf("Duplicated Post\n")
 					continue
 				}
 
